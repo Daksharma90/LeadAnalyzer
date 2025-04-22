@@ -14,7 +14,7 @@ st.set_page_config(page_title="Lead Intelligence for Almo Media", layout="wide")
 
 # ---- Load Almo Media Logo ---- #
 try:
-    almo_logo = Image.open(r"C:\Users\Yugensys\Desktop\logo.jpg")
+    almo_logo = Image.open(r"https://github.com/Daksharma90/LeadAnalyzer/blob/main/logo.jpg")
 except FileNotFoundError:
     almo_logo = None
     st.warning("⚠️ Almo Media logo not found at the specified path.")
