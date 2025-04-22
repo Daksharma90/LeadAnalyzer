@@ -1,6 +1,6 @@
 [theme]
 base="light"
-primaryColor="#0F52BA"  # Example primary color (Almo Media blue)
-secondaryBackgroundColor="#F0F2F6" # Light gray secondary background
-textColor="#262730"      # Dark gray/black for text
+primaryColor="#0F52BA"
+secondaryBackgroundColor="#F0F2F6"
+textColor="#262730"
 font="sans serif"
