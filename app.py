@@ -310,7 +310,7 @@ Respond with only the valid SQL query (no markdown, no extra text, no explanatio
                 st.caption(str(e))
 
 else:
-    st.info("📂 Please upload a CSV or Excel file to begin analyzing your lead data for Almo Media.")
+    st.info("📂 Please upload a CSV or Excel file to begin analyzing your lead data.")
 
 # ---- Footer ---- #
 st.markdown("---")
