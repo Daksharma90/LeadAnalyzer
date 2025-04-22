@@ -4,3 +4,4 @@ duckdb
 requests
 Pillow
 deepseek-ai
+openpyxl
