@@ -21,44 +21,43 @@ except FileNotFoundError:
 
 # ---- Custom Header with Logo and Branding (Larger Logo) ---- #
 st.markdown(
-    f"""
+    """
     <style>
-        .header-container {{
+        .header-container {
             display: flex;
             flex-direction: column; /* Arrange logo and text vertically */
             align-items: flex-start; /* Align items to the left */
             padding-bottom: 1rem;
             border-bottom: 1px solid #eee;
             margin-bottom: 1.5rem;
-        }}
-        .logo-container {{
+        }
+        .logo-container {
             margin-bottom: 0.5rem; /* Space between logo and subtitle */
-        }}
-        .logo-img {{
+        }
+        .logo-img {
             max-height: none; /* Remove max-height to allow larger scaling */
             width: 300px; /* Increased width for a larger logo */
-        }}
-        .sub-title {{
+        }
+        .sub-title {
             font-size: 16px !important; /* Slightly smaller subtitle */
-            color: #666;
             line-height: 1.4; /* Improved readability */
             text-align: left !important; /* Ensure left alignment */
-        }}
-        .block-container {{
+        }
+        .block-container {
             padding-top: 2rem;
-        }}
-        .st-expander {{
+        }
+        .st-expander {
             border: 1px solid #ddd;
             border-radius: 5px;
             margin-bottom: 0.5rem;
-        }}
-        .st-metric {{
+        }
+        .st-metric {
             padding: 15px;
             border-radius: 5px;
             background-color: #f9f9f9;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }}
-        .stDownloadButton {{
+        }
+        .stDownloadButton {
             background-color: #0F52BA !important;
             color: white !important;
             font-weight: bold !important;
@@ -66,23 +65,23 @@ st.markdown(
             padding: 10px 20px !important;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             transition: background-color 0.3s ease;
-        }}
-        .stDownloadButton:hover {{
+        }
+        .stDownloadButton:hover {
             background-color: #0A3D80 !important;
-        }}
-        .stTextInput > div > div > input {{
+        }
+        .stTextInput > div > div > input {
             border-radius: 5px;
             border: 1px solid #ccc;
             padding: 10px;
-        }}
-        .horizontal-columns {{
+        }
+        .horizontal-columns {
             display: flex;
             flex-wrap: wrap;
             gap: 5px; /* Adjust gap as needed */
-        }}
-        .column-name {{
+        }
+        .column-name {
             font-size: 0.9em;
-        }}
+        }
     </style>
     """,
     unsafe_allow_html=True,
