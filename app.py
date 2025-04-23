@@ -293,37 +293,37 @@ if uploaded_file:
         user_query = st.text_input("Enter your question here (e.g., 'Show me leads from companies with more than 50 employees')", "", key="user_query")
         run_query_button = st.button("Run Query")
 
-       if run_query_button:
-        with st.spinner("🔍 Processing your query..."):
-            try:
-                sql_query = query_deepseek(st.session_state.user_query, "leads", df)
-                result_df = duckdb.sql(sql_query).df()
+        if run_query_button:
+            with st.spinner("🔍 Processing your query..."):
+                try:
+                    sql_query = query_deepseek(st.session_state.user_query, "leads", df)
+                    result_df = duckdb.sql(sql_query).df()
 
-                if not result_df.empty:
-                    st.success(f"✅ Found {len(result_df):,} matching leads.")
-                    st.dataframe(result_df, use_container_width=True)
+                    if not result_df.empty:
+                        st.success(f"✅ Found {len(result_df):,} matching leads.")
+                        st.dataframe(result_df, use_container_width=True)
 
-                    csv = result_df.to_csv(index=False).encode("utf-8")
-                    st.download_button(
-                        label="📥 Download Query Results as CSV",
-                        data=csv,
-                        file_name="almo_media_lead_query_results.csv",
-                        mime="text/csv",
-                        use_container_width=True,
-                    )
-                else:
-                    st.info("No leads found matching your criteria.")
+                        csv = result_df.to_csv(index=False).encode("utf-8")
+                        st.download_button(
+                            label="📥 Download Query Results as CSV",
+                            data=csv,
+                            file_name="almo_media_lead_query_results.csv",
+                            mime="text/csv",
+                            use_container_width=True,
+                        )
+                    else:
+                        st.info("No leads found matching your criteria.")
 
-            except Exception as e: # Corrected: Changed 'else' to 'except'
-                st.error("⚠️ Sorry, an error occurred while processing your query.")
-                st.caption(str(e))
+                except Exception as e:
+                    st.error("⚠️ Sorry, an error occurred while processing your query.")
+                    st.caption(str(e))
+
+        else:
+            # Display a message if data is loaded but no query has been run
+            st.info("⬆️ Data loaded. Enter your query and click 'Run Query'.")
 
     else:
-        # Display a message if data is loaded but no query has been run
-        st.info("⬆️ Data loaded. Enter your query and click 'Run Query'.")
-
-else:
-    st.info("📂 Please upload a CSV or Excel file to begin analyzing your lead data.")
+        st.info("📂 Please upload a CSV or Excel file to begin analyzing your lead data.")
 
 # ---- Footer ---- #
 st.markdown("---")
