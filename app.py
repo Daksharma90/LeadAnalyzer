@@ -40,17 +40,23 @@ st.markdown(
         background-color: white !important;
         color: black !important;
     }
-    /* Target the Download button text */
+    /* Target the Download button text and background */
     .stDownloadButton label {
         color: white !important; /* Ensure text is white */
+        font-weight: bold !important; /* Make text bold */
     }
     .stDownloadButton {
         background-color: #0F52BA !important; /* Ensure button background is visible */
+        padding: 10px 20px !important; /* Add some padding for better visibility */
     }
     /* Target the Run Query button text */
     div[data-testid="stButton"] > button {
         color: white !important; /* Ensure text is white */
         background-color: #0F52BA !important; /* Ensure button background is visible */
+    }
+    /* Potentially target the icon (though less specific) */
+    .stDownloadButton svg {
+        fill: white !important;
     }
     </style>
     """,
