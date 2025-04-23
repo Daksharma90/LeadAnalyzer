@@ -16,6 +16,7 @@ st.set_page_config(page_title="Lead Intelligence for AlmohMedia", layout="wide")
 st.markdown(
     """
     <style>
+    /* General app styling */
     .stApp {
         background-color: white !important;
         color: black !important;
@@ -28,23 +29,33 @@ st.markdown(
         background-color: white !important;
         color: black !important;
     }
+
+    /* Markdown and metric text */
     div[data-testid="stMarkdownContainer"] * {
         color: black !important;
     }
     div[data-testid="stMetric"] * {
         color: black !important;
     }
+
+    /* Input field styling */
     div[data-testid="stTextInput"] > div > div > input {
         background-color: white !important;
         color: black !important;
     }
 
-    /* Updated Download Button Styling */
+    /* Fix white cursor in text input/textarea */
+    div[data-testid="stTextInput"] input,
+    textarea {
+        caret-color: black !important; /* Visible black cursor */
+    }
+
+    /* Download button styling */
     .stDownloadButton > button {
         background-color: #0F52BA !important;  /* Blue background */
         color: white !important;               /* White text */
         border: none !important;               /* Remove border */
-        padding: 10px 20px !important;         /* Add padding */
+        padding: 10px 20px !important;         /* Padding */
         font-weight: bold !important;          /* Bold text */
         border-radius: 8px !important;         /* Rounded corners */
         transition: background-color 0.3s ease !important;
@@ -58,7 +69,7 @@ st.markdown(
         fill: white !important;  /* White icon */
     }
 
-    /* Run Query Button Styling (if needed) */
+    /* Run Query button styling */
     div[data-testid="stButton"] > button {
         color: white !important;
         background-color: #0F52BA !important;
@@ -76,6 +87,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
 
 # ---- Load Almo Media Logo ---- #
 try:
