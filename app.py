@@ -53,11 +53,11 @@ st.markdown(
     /* Download button styling */
     .stDownloadButton > button {
         background-color: #0F52BA !important;  /* Blue background */
-        color: white !important;               /* White text */
-        border: none !important;               /* Remove border */
-        padding: 10px 20px !important;         /* Padding */
-        font-weight: bold !important;          /* Bold text */
-        border-radius: 8px !important;         /* Rounded corners */
+        color: white !important;            /* White text */
+        border: none !important;            /* Remove border */
+        padding: 10px 20px !important;      /* Padding */
+        font-weight: bold !important;      /* Bold text */
+        border-radius: 8px !important;      /* Rounded corners */
         transition: background-color 0.3s ease !important;
     }
 
@@ -204,98 +204,101 @@ if uploaded_file:
         df = read_file_with_encoding(uploaded_file)
         st.success("✅ File successfully loaded.")
         st.session_state.data_loaded = True # Set a flag when data is loaded
-    except Exception as e:
-        st.error(f"⚠️ Error loading file: {str(e)}")
-        st.stop()
 
-    # ---- Data Processing and Feature Engineering (No Changes Here) ---- #
-    def clean_numeric_column(col):
-        col = col.astype(str).str.replace(r"[\$,]", "", regex=True).str.lower()
-        def convert(val):
+        # ---- Data Processing and Feature Engineering ---- #
+        def clean_numeric_column(col):
+            col = col.astype(str).str.replace(r"[\$,]", "", regex=True).str.lower()
+            def convert(val):
+                try:
+                    val = val.strip()
+                    if 'billion' in val: return float(re.findall(r'[0-9.]+', val)[0]) * 1e9
+                    elif 'million' in val: return float(re.findall(r'[0-9.]+', val)[0]) * 1e6
+                    elif 'thousand' in val: return float(re.findall(r'[0-9.]+', val)[0]) * 1e3
+                    elif 'b' in val: return float(val.replace('b', '')) * 1e9
+                    elif 'm' in val: return float(val.replace('m', '')) * 1e6
+                    elif 'k' in val: return float(val.replace('k', '')) * 1e3
+                    return float(val)
+                except:
+                    return None
+            return col.apply(convert)
+
+        for col in df.columns:
+            if df[col].dtype == 'object':
+                sample = df[col].dropna().astype(str).str.lower()
+                if sample.str.contains(r'\d', regex=True).any():
+                    converted = clean_numeric_column(df[col])
+                    df[col] = converted.fillna(df[col])
+                else:
+                    df[col] = df[col].fillna("Unknown")
+            else:
+                df[col] = df[col].fillna(df[col].median())
+
+        def extract_min_emp_size(size_str):
             try:
-                val = val.strip()
-                if 'billion' in val: return float(re.findall(r'[0-9.]+', val)[0]) * 1e9
-                elif 'million' in val: return float(re.findall(r'[0-9.]+', val)[0]) * 1e6
-                elif 'thousand' in val: return float(re.findall(r'[0-9.]+', val)[0]) * 1e3
-                elif 'b' in val: return float(val.replace('b', '')) * 1e9
-                elif 'm' in val: return float(val.replace('m', '')) * 1e6
-                elif 'k' in val: return float(val.replace('k', '')) * 1e3
-                return float(val)
+                size_str = str(size_str).replace(",", "").strip()
+                if '+' in size_str: return int(re.findall(r'\d+', size_str)[0])
+                elif '-' in size_str: return int(size_str.split('-')[0])
+                else: return int(size_str)
             except:
                 return None
-        return col.apply(convert)
 
-    for col in df.columns:
-        if df[col].dtype == 'object':
-            sample = df[col].dropna().astype(str).str.lower()
-            if sample.str.contains(r'\d', regex=True).any():
-                converted = clean_numeric_column(df[col])
-                df[col] = converted.fillna(df[col])
-            else:
-                df[col] = df[col].fillna("Unknown")
-        else:
-            df[col] = df[col].fillna(df[col].median())
+        emp_columns = ["Employee Size range", "LinkedIn Emp Size", "Headcount", "Size"]
+        fallback_columns = ["Revenue Size", "Annual Revenue"]
 
-    def extract_min_emp_size(size_str):
+        emp_size_col = next((col for col in emp_columns if col in df.columns), None)
+        fallback_col = next((col for col in fallback_columns if col in df.columns), None)
+
+        if emp_size_col:
+            df["Emp Size Num"] = df[emp_size_col].apply(extract_min_emp_size)
+        elif fallback_col:
+            df["Emp Size Num"] = df[fallback_col]
+
+        if "Revenue Size" in df.columns:
+            df["Revenue Size"] = clean_numeric_column(df["Revenue Size"])
+
+        # --- Data Type Cleaning for PyArrow ---
+        for col in ["Phone", "Zip Code"]:
+            if col in df.columns:
+                df[col] = df[col].astype(str).fillna('').str.strip()
+        # --- End of Data Type Cleaning ---
+
         try:
-            size_str = str(size_str).replace(",", "").strip()
-            if '+' in size_str: return int(re.findall(r'\d+', size_str)[0])
-            elif '-' in size_str: return int(size_str.split('-')[0])
-            else: return int(size_str)
+            duckdb.unregister("leads")
         except:
-            return None
+            pass
+        duckdb.register("leads", df)
 
-    emp_columns = ["Employee Size range", "LinkedIn Emp Size", "Headcount", "Size"]
-    fallback_columns = ["Revenue Size", "Annual Revenue"]
+        st.success("✅ Data processing complete.")
 
-    emp_size_col = next((col for col in emp_columns if col in df.columns), None)
-    fallback_col = next((col for col in fallback_columns if col in df.columns), None)
+        # ---- Data Overview Metrics (Styled) ---- #
+        st.subheader("📊 Data Overview")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total Leads", f"{len(df):,}")
+        with col2:
+            st.metric("Number of Attributes", len(df.columns))
+        with col3:
+            st.metric("Numeric Attributes", df.select_dtypes(include='number').shape[1])
 
-    if emp_size_col:
-        df["Emp Size Num"] = df[emp_size_col].apply(extract_min_emp_size)
-    elif fallback_col:
-        df["Emp Size Num"] = df[fallback_col]
+        # ---- Optional Data Exploration (Styled Expanders) ---- #
+        with st.expander("🔍 Explore Sample Data"):
+            st.dataframe(df.head(10), use_container_width=True)
 
-    if "Revenue Size" in df.columns:
-        df["Revenue Size"] = clean_numeric_column(df["Revenue Size"])
+        with st.expander("📌 View All Column Names"):
+            column_names_text = ", ".join(df.columns)
+            st.markdown(f"<div style='font-size: 0.9em; white-space: pre-wrap;'>{column_names_text}</div>", unsafe_allow_html=True)
 
-    try:
-        duckdb.unregister("leads")
-    except:
-        pass
-    duckdb.register("leads", df)
+        # ---- Querying Section (Styled Input with Button) ---- #
+        st.subheader("🧠 Ask Questions About Your Leads")
+        user_query = st.text_input("Enter your question here (e.g., 'Show me leads from companies with more than 50 employees')", "", key="user_query")
+        run_query_button = st.button("Run Query")
 
-    st.success("✅ Data processing complete.")
+        if run_query_button and uploaded_file: # Only run if button is pressed AND a file is uploaded
+            def query_deepseek(user_query, table_name, df):
+                schema_description = "\n".join([f'- \"{col}\" ({str(dtype)})' for col, dtype in zip(df.columns, df.dtypes)])
+                sample_rows = df.head(5).to_dict(orient="records")
 
-    # ---- Data Overview Metrics (Styled) ---- #
-    st.subheader("📊 Data Overview")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Total Leads", f"{len(df):,}")
-    with col2:
-        st.metric("Number of Attributes", len(df.columns))
-    with col3:
-        st.metric("Numeric Attributes", df.select_dtypes(include='number').shape[1])
-
-    # ---- Optional Data Exploration (Styled Expanders) ---- #
-    with st.expander("🔍 Explore Sample Data"):
-        st.dataframe(df.head(10), use_container_width=True)
-
-    with st.expander("📌 View All Column Names"):
-        column_names_text = ", ".join(df.columns)
-        st.markdown(f"<div style='font-size: 0.9em; white-space: pre-wrap;'>{column_names_text}</div>", unsafe_allow_html=True)
-
-    # ---- Querying Section (Styled Input with Button) ---- #
-    st.subheader("🧠 Ask Questions About Your Leads")
-    user_query = st.text_input("Enter your question here (e.g., 'Show me leads from companies with more than 50 employees')", "", key="user_query")
-    run_query_button = st.button("Run Query")
-
-    if run_query_button and uploaded_file: # Only run if button is pressed AND a file is uploaded
-        def query_deepseek(user_query, table_name, df):
-            schema_description = "\n".join([f'- \"{col}\" ({str(dtype)})' for col, dtype in zip(df.columns, df.dtypes)])
-            sample_rows = df.head(5).to_dict(orient="records")
-
-            system_prompt = f"""You are a smart SQL assistant that converts natural language into precise SQL queries for DuckDB.
+                system_prompt = f"""You are a smart SQL assistant that converts natural language into precise SQL queries for DuckDB.
 
 ### CONTEXT:
 You will be working with a table named: leads
@@ -343,52 +346,52 @@ These are example rows to understand context and content:
 ### OUTPUT FORMAT:
 Respond with only the valid SQL query (no markdown, no extra text, no explanations)."""
 
-            headers = {
-                "Authorization": f"Bearer {API_KEY}",
-                "Content-Type": "application/json",
-            }
+                headers = {
+                    "Authorization": f"Bearer {API_KEY}",
+                    "Content-Type": "application/json",
+                }
 
-            payload = {
-                "model": "deepseek-chat",
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_query}
-                ],
-                "temperature": 0.3
-            }
+                payload = {
+                    "model": "deepseek-chat",
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_query}
+                    ],
+                    "temperature": 0.3
+                }
 
-            response = requests.post(API_URL, headers=headers, json=payload)
+                response = requests.post(API_URL, headers=headers, json=payload)
 
-            if response.status_code != 200:
-                raise Exception(f"DeepSeek API Error: {response.text}")
+                if response.status_code != 200:
+                    raise Exception(f"DeepSeek API Error: {response.text}")
 
-            raw_sql = response.json()["choices"][0]["message"]["content"].strip()
-            cleaned_sql = raw_sql.replace("```sql", "").replace("```", "").strip()
-            return cleaned_sql
+                raw_sql = response.json()["choices"][0]["message"]["content"].strip()
+                cleaned_sql = raw_sql.replace("```sql", "").replace("```", "").strip()
+                return cleaned_sql
 
-        with st.spinner("🔍 Processing your query..."):
-            try:
-                sql_query = query_deepseek(st.session_state.user_query, "leads", df)
-                result_df = duckdb.sql(sql_query).df()
+            with st.spinner("🔍 Processing your query..."):
+                try:
+                    sql_query = query_deepseek(st.session_state.user_query, "leads", df)
+                    result_df = duckdb.sql(sql_query).df()
 
-                if not result_df.empty:
-                    st.success(f"✅ Found {len(result_df):,} matching leads.")
-                    st.dataframe(result_df, use_container_width=True)
+                    if not result_df.empty:
+                        st.success(f"✅ Found {len(result_df):,} matching leads.")
+                        st.dataframe(result_df, use_container_width=True)
 
-                    csv = result_df.to_csv(index=False).encode("utf-8")
-                    st.download_button(
-                        label="📥 Download Query Results as CSV",
-                        data=csv,
-                        file_name="almo_media_lead_query_results.csv",
-                        mime="text/csv",
-                        use_container_width=True,
-                    )
-                else:
-                    st.info("No leads found matching your criteria.")
+                        csv = result_df.to_csv(index=False).encode("utf-8")
+                        st.download_button(
+                            label="📥 Download Query Results as CSV",
+                            data=csv,
+                            file_name="almo_media_lead_query_results.csv",
+                            mime="text/csv",
+                            use_container_width=True,
+                        )
+                    else:
+                        st.info("No leads found matching your criteria.")
 
-            except Exception as e:
-                st.error("⚠️ Sorry, an error occurred while processing your query.")
-                st.caption(str(e))
+                except Exception as e:
+                    st.error("⚠️ Sorry, an error occurred while processing your query.")
+                    st.caption(str(e))
 
     elif uploaded_file:
         # Display a message if data is loaded but no query has been run
