@@ -42,8 +42,8 @@ st.markdown(
         color: black !important;
     }
     /* Target the Download button text */
-    .stDownloadButton > label { /* More specific targeting */
-        color: red !important; /* Ensure text is red */
+    .stDownloadButton > div[data-testid="stMarkdownContainer"] > svg { /* Target the icon */
+        fill: red !important; /* Set the icon color to red */
     }
     .stDownloadButton {
         background-color: #0F52BA !important; /* Ensure button background is visible */
@@ -57,6 +57,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
 # ---- Load Almo Media Logo ---- #
 try:
     almo_logo = Image.open("logo.jpg")
