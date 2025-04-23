@@ -12,6 +12,87 @@ API_URL = "https://api.deepseek.com/v1/chat/completions"
 ENCODINGS = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252', 'utf-16', 'utf-32']
 st.set_page_config(page_title="Lead Intelligence for Almo Media", layout="wide")
 
+# ---- Custom CSS for Background and Rounded Boxes ---- #
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: #f0f2f6; /* Light grey background */
+    }
+    .rounded-box {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+    .header-container {
+        display: flex;
+        flex-direction: column; /* Arrange logo and text vertically */
+        align-items: flex-start; /* Align items to the left */
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 1.5rem;
+    }
+    .logo-container {
+        margin-bottom: 0.5rem; /* Space between logo and subtitle */
+    }
+    .logo-img {
+        max-height: none; /* Remove max-height to allow larger scaling */
+        width: 300px; /* Increased width for a larger logo */
+    }
+    .sub-title {
+        font-size: 16px !important; /* Slightly smaller subtitle */
+        line-height: 1.4; /* Improved readability */
+        text-align: left !important; /* Ensure left alignment */
+    }
+    .block-container {
+        padding-top: 2rem;
+    }
+    .st-expander {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 0.5rem;
+        background-color: white; /* Add white background to expanders */
+        padding: 10px; /* Add some padding */
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Subtle shadow */
+    }
+    .st-metric {
+        padding: 15px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .stDownloadButton {
+        background-color: #0F52BA !important;
+        color: white !important;
+        font-weight: bold !important;
+        border-radius: 5px !important;
+        padding: 10px 20px !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: background-color 0.3s ease;
+    }
+    .stDownloadButton:hover {
+        background-color: #0A3D80 !important;
+    }
+    .stTextInput > div > div > input {
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+    .horizontal-columns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px; /* Adjust gap as needed */
+    }
+    .column-name {
+        font-size: 0.9em;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # ---- Load Almo Media Logo ---- #
 try:
     almo_logo = Image.open("logo.jpg")
@@ -20,73 +101,6 @@ except FileNotFoundError:
     st.warning("⚠️ Almo Media logo not found at the specified path.")
 
 # ---- Custom Header with Logo and Branding (Larger Logo) ---- #
-st.markdown(
-    """
-    <style>
-        .header-container {
-            display: flex;
-            flex-direction: column; /* Arrange logo and text vertically */
-            align-items: flex-start; /* Align items to the left */
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 1.5rem;
-        }
-        .logo-container {
-            margin-bottom: 0.5rem; /* Space between logo and subtitle */
-        }
-        .logo-img {
-            max-height: none; /* Remove max-height to allow larger scaling */
-            width: 300px; /* Increased width for a larger logo */
-        }
-        .sub-title {
-            font-size: 16px !important; /* Slightly smaller subtitle */
-            line-height: 1.4; /* Improved readability */
-            text-align: left !important; /* Ensure left alignment */
-        }
-        .block-container {
-            padding-top: 2rem;
-        }
-        .st-expander {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 0.5rem;
-        }
-        .st-metric {
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .stDownloadButton {
-            background-color: #0F52BA !important;
-            color: white !important;
-            font-weight: bold !important;
-            border-radius: 5px !important;
-            padding: 10px 20px !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: background-color 0.3s ease;
-        }
-        .stDownloadButton:hover {
-            background-color: #0A3D80 !important;
-        }
-        .stTextInput > div > div > input {
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            padding: 10px;
-        }
-        .horizontal-columns {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px; /* Adjust gap as needed */
-        }
-        .column-name {
-            font-size: 0.9em;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 with st.container():
     st.markdown('<div class="header-container">', unsafe_allow_html=True)
     if almo_logo:
@@ -96,35 +110,18 @@ with st.container():
 
 st.divider()
 
-# ---- File Reader with Encoding Handling (Encoding Hidden) ---- #
-def read_file_with_encoding(uploaded_file):
-    content = uploaded_file.read()
-    uploaded_file.seek(0)
-
-    if uploaded_file.name.endswith(".csv"):
-        for encoding in ENCODINGS:
-            try:
-                decoded = content.decode(encoding)
-                df = pd.read_csv(io.StringIO(decoded))
-                return df
-            except Exception:
-                continue
-        raise ValueError("❌ Unable to decode the CSV file with supported encodings.")
-
-    elif uploaded_file.name.endswith((".xls", ".xlsx")):
-        return pd.read_excel(uploaded_file)
-
-    else:
-        raise ValueError("❌ Unsupported file format.")
-
 # ---- Upload File Section ---- #
+st.markdown('<div class="rounded-box">', unsafe_allow_html=True)
 st.subheader("📤 Upload Your Lead Data")
 uploaded_file = st.file_uploader("Drag and drop your CSV or Excel file here", type=["csv", "xls", "xlsx"])
+st.markdown('</div>', unsafe_allow_html=True)
 
 if uploaded_file:
     try:
         df = read_file_with_encoding(uploaded_file)
+        st.markdown('<div class="rounded-box">', unsafe_allow_html=True)
         st.success("✅ File successfully loaded.") # Removed encoding information
+        st.markdown('</div>', unsafe_allow_html=True)
     except Exception as e:
         st.error(f"⚠️ Error loading file: {str(e)}")
         st.stop()
@@ -186,7 +183,9 @@ if uploaded_file:
         pass
     duckdb.register("leads", df)
 
+    st.markdown('<div class="rounded-box">', unsafe_allow_html=True)
     st.success("✅ Data processing complete.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # ---- Data Overview Metrics (Styled) ---- #
     st.subheader("📊 Data Overview")
@@ -290,6 +289,7 @@ Respond with only the valid SQL query (no markdown, no extra text, no explanatio
                 result_df = duckdb.sql(sql_query).df()
 
                 if not result_df.empty:
+                    st.markdown('<div class="rounded-box">', unsafe_allow_html=True)
                     st.success(f"✅ Found {len(result_df):,} matching leads.")
                     st.dataframe(result_df, use_container_width=True)
 
@@ -301,15 +301,22 @@ Respond with only the valid SQL query (no markdown, no extra text, no explanatio
                         mime="text/csv",
                         use_container_width=True,
                     )
+                    st.markdown('</div>', unsafe_allow_html=True)
                 else:
+                    st.markdown('<div class="rounded-box">', unsafe_allow_html=True)
                     st.info("No leads found matching your criteria.")
+                    st.markdown('</div>', unsafe_allow_html=True)
 
             except Exception as e:
+                st.markdown('<div class="rounded-box">', unsafe_allow_html=True)
                 st.error("⚠️ Sorry, an error occurred while processing your query.")
                 st.caption(str(e))
+                st.markdown('</div>', unsafe_allow_html=True)
 
 else:
+    st.markdown('<div class="rounded-box">', unsafe_allow_html=True)
     st.info("📂 Please upload a CSV or Excel file to begin analyzing your lead data.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ---- Footer ---- #
 st.markdown("---")
