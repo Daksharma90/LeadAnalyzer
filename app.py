@@ -10,7 +10,7 @@ from PIL import Image
 API_KEY = "sk-153c4decdf4e4a79995c685af7fad5c8"
 API_URL = "https://api.deepseek.com/v1/chat/completions"
 ENCODINGS = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252', 'utf-16', 'utf-32']
-st.set_page_config(page_title="Lead Intelligence for Almo Media", layout="wide")
+st.set_page_config(page_title="Lead Intelligence for AlmohMedia", layout="wide")
 
 # ---- Forcefully set background to white and text to black with CSS ---- #
 st.markdown(
@@ -32,10 +32,12 @@ st.markdown(
     div[data-testid="stMarkdownContainer"] * {
         color: black !important;
     }
-    div[data-testid="stTextInput"] * {
+    div[data-testid="stMetric"] * {
         color: black !important;
     }
-    div[data-testid="stMetric"] * {
+    /* Target the text input field */
+    div[data-testid="stTextInput"] > div > div > input {
+        background-color: white !important;
         color: black !important;
     }
     </style>
@@ -279,6 +281,7 @@ These are example rows to understand context and content:
     - **Numbers**: CAST to DOUBLE → `CAST("Revenue Size" AS DOUBLE)`
 6. When comparing dates like "last 60 days":
     - Use: `CAST("Last Funding Date" AS TIMESTAMP) >= CURRENT_DATE - INTERVAL '60 days'`
+    - **Numbers**: CAST to DOUBLE → `CAST("Revenue Size" AS DOUBLE)`
 7. Always ensure correct casting before numeric or timestamp comparisons.
 8. Always handle missing/null values gracefully using `IS NOT NULL` where needed.
 9. Combine multiple conditions with AND/OR using parentheses properly.
