@@ -40,6 +40,13 @@ st.markdown(
         background-color: white !important;
         color: black !important;
     }
+    /* Target the Download button text */
+    .stDownloadButton label {
+        color: white !important; /* Ensure text is white */
+    }
+    .stDownloadButton {
+        background-color: #0F52BA !important; /* Ensure button background is visible */
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -157,7 +164,8 @@ uploaded_file = st.file_uploader("Drag and drop your CSV or Excel file here", ty
 if uploaded_file:
     try:
         df = read_file_with_encoding(uploaded_file)
-        st.success("✅ File successfully loaded.") # Removed encoding information
+        st.success("✅ File successfully loaded.")
+        st.session_state.data_loaded = True # Set a flag when data is loaded
     except Exception as e:
         st.error(f"⚠️ Error loading file: {str(e)}")
         st.stop()
@@ -239,11 +247,12 @@ if uploaded_file:
         column_names_text = ", ".join(df.columns)
         st.markdown(f"<div style='font-size: 0.9em; white-space: pre-wrap;'>{column_names_text}</div>", unsafe_allow_html=True)
 
-    # ---- Querying Section (Styled Input) ---- #
+    # ---- Querying Section (Styled Input with Button) ---- #
     st.subheader("🧠 Ask Questions About Your Leads")
-    user_query = st.text_input("Enter your question here (e.g., 'Show me leads from companies with more than 50 employees')", "")
+    user_query = st.text_input("Enter your question here (e.g., 'Show me leads from companies with more than 50 employees')", "", key="user_query")
+    run_query_button = st.button("Run Query")
 
-    if user_query:
+    if run_query_button and uploaded_file: # Only run if button is pressed AND a file is uploaded
         def query_deepseek(user_query, table_name, df):
             schema_description = "\n".join([f'- \"{col}\" ({str(dtype)})' for col, dtype in zip(df.columns, df.dtypes)])
             sample_rows = df.head(5).to_dict(orient="records")
@@ -275,7 +284,7 @@ These are example rows to understand context and content:
 3. For partial text matches (like job titles or industries), use:
     - `ILIKE '%keyword%'`
 4. For boolean-like values (e.g. "is verified", "has funding"):
-    - Match values like 'yes', 'true', or 1
+        - Match values like 'yes', 'true', or 1
 5. If comparing values in **string columns** with:
     - **Dates**: CAST to TIMESTAMP → `CAST("Last Funding Date" AS TIMESTAMP)`
     - **Numbers**: CAST to DOUBLE → `CAST("Revenue Size" AS DOUBLE)`
@@ -320,7 +329,7 @@ Respond with only the valid SQL query (no markdown, no extra text, no explanatio
 
         with st.spinner("🔍 Processing your query..."):
             try:
-                sql_query = query_deepseek(user_query, "leads", df)
+                sql_query = query_deepseek(st.session_state.user_query, "leads", df)
                 result_df = duckdb.sql(sql_query).df()
 
                 if not result_df.empty:
@@ -342,8 +351,11 @@ Respond with only the valid SQL query (no markdown, no extra text, no explanatio
                 st.error("⚠️ Sorry, an error occurred while processing your query.")
                 st.caption(str(e))
 
-else:
-    st.info("📂 Please upload a CSV or Excel file to begin analyzing your lead data.")
+    elif uploaded_file:
+        # Display a message if data is loaded but no query has been run
+        st.info("⬆️ Data loaded. Enter your query and click 'Run Query'.")
+    else:
+        st.info("📂 Please upload a CSV or Excel file to begin analyzing your lead data.")
 
 # ---- Footer ---- #
 st.markdown("---")
