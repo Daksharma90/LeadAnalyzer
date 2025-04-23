@@ -12,6 +12,18 @@ API_URL = "https://api.deepseek.com/v1/chat/completions"
 ENCODINGS = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252', 'utf-16', 'utf-32']
 st.set_page_config(page_title="Lead Intelligence for Almo Media", layout="wide")
 
+# ---- Custom CSS to set background to white ---- #
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: white !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # ---- Load Almo Media Logo ---- #
 try:
     almo_logo = Image.open("logo.jpg")
