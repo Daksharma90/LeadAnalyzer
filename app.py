@@ -322,6 +322,7 @@ These are example rows to understand context and content:
     - "employees", "staff count" → "Emp Size Num"
     - "annual revenue", "total revenue" → "Revenue Size"
     - These mappings should be used only if the actual column exists in the provided schema.
+11. When the user's query specifies a condition on a particular attribute (e.g., location, industry) to filter rows, ensure that the SQL query returns all columns (`SELECT *`) for the matching rows.
 
 ### OUTPUT FORMAT:
 Respond with only the valid SQL query (no markdown, no extra text, no explanations)."""
