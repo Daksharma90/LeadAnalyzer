@@ -12,11 +12,17 @@ API_URL = "https://api.deepseek.com/v1/chat/completions"
 ENCODINGS = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252', 'utf-16', 'utf-32']
 st.set_page_config(page_title="Lead Intelligence for Almo Media", layout="wide")
 
-# ---- Custom CSS to set background to white ---- #
+# ---- Forcefully set background to white with CSS ---- #
 st.markdown(
     """
     <style>
+    .stApp {
+        background-color: white !important;
+    }
     body {
+        background-color: white !important;
+    }
+    div[data-testid="stVerticalBlock"] {
         background-color: white !important;
     }
     </style>
@@ -229,49 +235,49 @@ if uploaded_file:
 
             system_prompt = f"""You are a smart SQL assistant that converts natural language into precise SQL queries for DuckDB.
 
-### CONTEXT:
-You will be working with a table named: leads
-This table is loaded from a CSV/XLS file, so column types may vary (e.g., dates as strings, numbers with symbols, or missing values).
-The user may not know exact column names or data types, so your job is to interpret intent and output valid SQL.
+    ### CONTEXT:
+    You will be working with a table named: leads
+    This table is loaded from a CSV/XLS file, so column types may vary (e.g., dates as strings, numbers with symbols, or missing values).
+    The user may not know exact column names or data types, so your job is to interpret intent and output valid SQL.
 
-### RULES FOR WRITING SQL:
-- Always use only the table name: leads
-- Wrap all column names in **double quotes**
-- Do NOT guess column names — only use those provided
-- Ensure SQL is compatible with DuckDB syntax
+    ### RULES FOR WRITING SQL:
+    - Always use only the table name: leads
+    - Wrap all column names in **double quotes**
+    - Do NOT guess column names — only use those provided
+    - Ensure SQL is compatible with DuckDB syntax
 
-### COLUMN METADATA:
-Below are the column names and their data types:
-{schema_description}
+    ### COLUMN METADATA:
+    Below are the column names and their data types:
+    {schema_description}
 
-### SAMPLE ROWS:
-These are example rows to understand context and content:
-{sample_rows}
+    ### SAMPLE ROWS:
+    These are example rows to understand context and content:
+    {sample_rows}
 
-### SPECIAL HANDLING RULES:
-1. If a column contains ranges like "1001-5000" or "10,001+", use the "Emp Size Num" column (if present) for numeric filtering.
-2. If employee size is missing, but revenue exists, assume "Emp Size Num" may have been inferred from "Revenue Size".
-3. For partial text matches (like job titles or industries), use:
-    - `ILIKE '%keyword%'`
-4. For boolean-like values (e.g. "is verified", "has funding"):
-    - Match values like 'yes', 'true', or 1
-5. If comparing values in **string columns** with:
-    - **Dates**: CAST to TIMESTAMP → `CAST("Last Funding Date" AS TIMESTAMP)`
-    - **Numbers**: CAST to DOUBLE → `CAST("Revenue Size" AS DOUBLE)`
-6. When comparing dates like "last 60 days":
-    - Use: `CAST("Last Funding Date" AS TIMESTAMP) >= CURRENT_DATE - INTERVAL '60 days'`
-7. Always ensure correct casting before numeric or timestamp comparisons.
-8. Always handle missing/null values gracefully using `IS NOT NULL` where needed.
-9. Combine multiple conditions with AND/OR using parentheses properly.
-10. If the user uses general terms like "revenue", "employee size", or "headcount", map them to the actual column names:
-    - "revenue" → "Revenue Size"
-    - "employee size", "headcount" → "Emp Size Num"
-    - "employees", "staff count" → "Emp Size Num"
-    - "annual revenue", "total revenue" → "Revenue Size"
-    - These mappings should be used only if the actual column exists in the provided schema.
+    ### SPECIAL HANDLING RULES:
+    1. If a column contains ranges like "1001-5000" or "10,001+", use the "Emp Size Num" column (if present) for numeric filtering.
+    2. If employee size is missing, but revenue exists, assume "Emp Size Num" may have been inferred from "Revenue Size".
+    3. For partial text matches (like job titles or industries), use:
+        - `ILIKE '%keyword%'`
+    4. For boolean-like values (e.g. "is verified", "has funding"):
+        - Match values like 'yes', 'true', or 1
+    5. If comparing values in **string columns** with:
+        - **Dates**: CAST to TIMESTAMP → `CAST("Last Funding Date" AS TIMESTAMP)`
+        - **Numbers**: CAST to DOUBLE → `CAST("Revenue Size" AS DOUBLE)`
+    6. When comparing dates like "last 60 days":
+        - Use: `CAST("Last Funding Date" AS TIMESTAMP) >= CURRENT_DATE - INTERVAL '60 days'`
+    7. Always ensure correct casting before numeric or timestamp comparisons.
+    8. Always handle missing/null values gracefully using `IS NOT NULL` where needed.
+    9. Combine multiple conditions with AND/OR using parentheses properly.
+    10. If the user uses general terms like "revenue", "employee size", or "headcount", map them to the actual column names:
+        - "revenue" → "Revenue Size"
+        - "employee size", "headcount" → "Emp Size Num"
+        - "employees", "staff count" → "Emp Size Num"
+        - "annual revenue", "total revenue" → "Revenue Size"
+        - These mappings should be used only if the actual column exists in the provided schema.
 
-### OUTPUT FORMAT:
-Respond with only the valid SQL query (no markdown, no extra text, no explanations)."""
+    ### OUTPUT FORMAT:
+    Respond with only the valid SQL query (no markdown, no extra text, no explanations)."""
 
             headers = {
                 "Authorization": f"Bearer {API_KEY}",
@@ -320,12 +326,12 @@ Respond with only the valid SQL query (no markdown, no extra text, no explanatio
                 st.error("⚠️ Sorry, an error occurred while processing your query.")
                 st.caption(str(e))
 
-else:
-    st.info("📂 Please upload a CSV or Excel file to begin analyzing your lead data.")
+    else:
+        st.info("📂 Please upload a CSV or Excel file to begin analyzing your lead data.")
 
-# ---- Footer ---- #
-st.markdown("---")
-st.markdown(
-    '<p style="text-align: center; color: #888;">Powered by <a href="https://www.yugensys.com/" target="_blank" style="color: #0F52BA;">Yugensys Software</a></p>',
-    unsafe_allow_html=True,
-)
+    # ---- Footer ---- #
+    st.markdown("---")
+    st.markdown(
+        '<p style="text-align: center; color: #888;">Powered by <a href="https://www.yugensys.com/" target="_blank" style="color: #0F52BA;">Yugensys Software</a></p>',
+        unsafe_allow_html=True,
+    )
