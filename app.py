@@ -47,6 +47,11 @@ st.markdown(
     .stDownloadButton {
         background-color: #0F52BA !important; /* Ensure button background is visible */
     }
+    /* Target the Run Query button text */
+    div[data-testid="stButton"] > button {
+        color: white !important; /* Ensure text is white */
+        background-color: #0F52BA !important; /* Ensure button background is visible */
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -105,9 +110,6 @@ st.markdown(
             padding: 10px 20px !important;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             transition: background-color 0.3s ease;
-        }
-        .stDownloadButton:hover {
-            background-color: #0A3D80 !important;
         }
         .stTextInput > div > div > input {
             border-radius: 5px;
