@@ -13,6 +13,7 @@ ENCODINGS = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252', 'utf-16', 'utf-32']
 st.set_page_config(page_title="Lead Intelligence for AlmohMedia", layout="wide")
 
 # ---- Forcefully set background to white and text to black with CSS ---- #
+# ---- Forcefully set background to white and text to black with CSS ---- #
 st.markdown(
     """
     <style>
@@ -41,7 +42,7 @@ st.markdown(
         color: black !important;
     }
     /* Target the Download button text */
-    .stDownloadButton label {
+    .stDownloadButton > label { /* More specific targeting */
         color: white !important; /* Ensure text is white */
     }
     .stDownloadButton {
@@ -56,7 +57,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
 # ---- Load Almo Media Logo ---- #
 try:
     almo_logo = Image.open("logo.jpg")
