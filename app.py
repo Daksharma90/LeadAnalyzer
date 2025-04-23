@@ -83,6 +83,10 @@ st.markdown(
     div[data-testid="stButton"] > button:hover {
         background-color: #084298 !important;
     }
+    /* Hide the GitHub icon and entire Streamlit menu */
+    header[data-testid="stHeader"] {
+        visibility: hidden !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
