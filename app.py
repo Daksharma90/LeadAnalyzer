@@ -53,11 +53,11 @@ st.markdown(
     /* Download button styling */
     .stDownloadButton > button {
         background-color: #0F52BA !important;  /* Blue background */
-        color: white !important;               /* White text */
-        border: none !important;               /* Remove border */
-        padding: 10px 20px !important;         /* Padding */
-        font-weight: bold !important;          /* Bold text */
-        border-radius: 8px !important;         /* Rounded corners */
+        color: white !important;                 /* White text */
+        border: none !important;                 /* Remove border */
+        padding: 10px 20px !important;          /* Padding */
+        font-weight: bold !important;           /* Bold text */
+        border-radius: 8px !important;          /* Rounded corners */
         transition: background-color 0.3s ease !important;
     }
 
@@ -174,18 +174,23 @@ with st.container():
 
 st.divider()
 
-# ---- File Reader with Encoding Handling (Encoding Hidden) ---- #
+# ---- File Reader with Optimized Encoding Handling ---- #
 def read_file_with_encoding(uploaded_file):
-    content = uploaded_file.read()
-    uploaded_file.seek(0)
-
     if uploaded_file.name.endswith(".csv"):
-        for encoding in ENCODINGS:
+        # Try the most common encoding first
+        for encoding in ['utf-8']:
             try:
-                decoded = content.decode(encoding)
-                df = pd.read_csv(io.StringIO(decoded))
+                df = pd.read_csv(uploaded_file, encoding=encoding)
                 return df
-            except Exception:
+            except UnicodeDecodeError:
+                continue
+        # If utf-8 fails, try others with a warning (reading in chunks might be more memory-efficient for very large files)
+        st.warning(f"⚠️ UTF-8 decoding failed. Trying other encodings for {uploaded_file.name}. This might take longer.")
+        for encoding in ENCODINGS[1:]: # Skip utf-8 as we already tried
+            try:
+                df = pd.read_csv(uploaded_file, encoding=encoding)
+                return df
+            except UnicodeDecodeError:
                 continue
         raise ValueError("❌ Unable to decode the CSV file with supported encodings.")
 
@@ -208,7 +213,7 @@ if uploaded_file:
         st.error(f"⚠️ Error loading file: {str(e)}")
         st.stop()
 
-    # ---- Data Processing and Feature Engineering (No Changes Here) ---- #
+    # ---- Data Processing and Feature Engineering (No Changes Here - Review for Optimization later) ---- #
     def clean_numeric_column(col):
         col = col.astype(str).str.replace(r"[\$,]", "", regex=True).str.lower()
         def convert(val):
@@ -360,7 +365,7 @@ Respond with only the valid SQL query (no markdown, no extra text, no explanatio
             response = requests.post(API_URL, headers=headers, json=payload)
 
             if response.status_code != 200:
-                raise Exception(f"DeepSeek API Error: {response.text}")
+                raise Exception(f"DeepSeek API Error:{response.text}")
 
             raw_sql = response.json()["choices"][0]["message"]["content"].strip()
             cleaned_sql = raw_sql.replace("```sql", "").replace("```", "").strip()
