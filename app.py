@@ -28,35 +28,49 @@ st.markdown(
         background-color: white !important;
         color: black !important;
     }
-    /* Target Streamlit elements to ensure text is visible */
     div[data-testid="stMarkdownContainer"] * {
         color: black !important;
     }
     div[data-testid="stMetric"] * {
         color: black !important;
     }
-    /* Target the text input field */
     div[data-testid="stTextInput"] > div > div > input {
         background-color: white !important;
         color: black !important;
     }
-    /* Target the Download button text and background */
-    .stDownloadButton label {
-        color: white !important; /* Ensure text is white */
-        font-weight: bold !important; /* Make text bold */
+
+    /* Updated Download Button Styling */
+    .stDownloadButton > button {
+        background-color: #0F52BA !important;  /* Blue background */
+        color: white !important;               /* White text */
+        border: none !important;               /* Remove border */
+        padding: 10px 20px !important;         /* Add padding */
+        font-weight: bold !important;          /* Bold text */
+        border-radius: 8px !important;         /* Rounded corners */
+        transition: background-color 0.3s ease !important;
     }
-    .stDownloadButton {
-        background-color: #0F52BA !important; /* Ensure button background is visible */
-        padding: 10px 20px !important; /* Add some padding for better visibility */
+
+    .stDownloadButton > button:hover {
+        background-color: #084298 !important;  /* Darker blue on hover */
     }
-    /* Target the Run Query button text */
-    div[data-testid="stButton"] > button {
-        color: white !important; /* Ensure text is white */
-        background-color: #0F52BA !important; /* Ensure button background is visible */
-    }
-    /* Potentially target the icon (though less specific) */
+
     .stDownloadButton svg {
-        fill: white !important;
+        fill: white !important;  /* White icon */
+    }
+
+    /* Run Query Button Styling (if needed) */
+    div[data-testid="stButton"] > button {
+        color: white !important;
+        background-color: #0F52BA !important;
+        border: none !important;
+        font-weight: bold !important;
+        border-radius: 8px !important;
+        padding: 10px 20px !important;
+        transition: background-color 0.3s ease !important;
+    }
+
+    div[data-testid="stButton"] > button:hover {
+        background-color: #084298 !important;
     }
     </style>
     """,
