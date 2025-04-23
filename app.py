@@ -43,7 +43,7 @@ st.markdown(
     }
     /* Target the Download button text */
     .stDownloadButton > label { /* More specific targeting */
-        color: white !important; /* Ensure text is white */
+        color: red !important; /* Ensure text is red */
     }
     .stDownloadButton {
         background-color: #0F52BA !important; /* Ensure button background is visible */
