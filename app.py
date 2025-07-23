@@ -7,7 +7,7 @@ import io
 from PIL import Image
 
 # ---- CONFIG ---- #
-API_KEY = "--"
+API_KEY = "sk-153c4decdf4e4a79995c685af7fad5c8"
 API_URL = "https://api.deepseek.com/v1/chat/completions"
 ENCODINGS = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252', 'utf-16', 'utf-32']
 st.set_page_config(page_title="Lead Intelligence for AlmohMedia", layout="wide")
