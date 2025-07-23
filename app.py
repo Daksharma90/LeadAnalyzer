@@ -10,7 +10,7 @@ from PIL import Image
 API_KEY = "--"
 API_URL = "https://api.deepseek.com/v1/chat/completions"
 ENCODINGS = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252', 'utf-16', 'utf-32']
-st.set_page_config(page_title="Lead Intelligence for AlmohMedia", layout="wide")
+st.set_page_config(page_title="-", layout="wide")
 
 # ---- Forcefully set background to white and text to black with CSS ---- #
 st.markdown(
@@ -98,7 +98,7 @@ try:
     almo_logo = Image.open("logo.jpg")
 except FileNotFoundError:
     almo_logo = None
-    st.warning("⚠️ Almo Media logo not found at the specified path.")
+    st.warning("--.")
 
 # ---- Custom Header with Logo and Branding (Larger Logo) ---- #
 st.markdown(
