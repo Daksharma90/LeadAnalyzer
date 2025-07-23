@@ -404,6 +404,6 @@ Respond with only the valid SQL query (no markdown, no extra text, no explanatio
 # ---- Footer ---- #
 st.markdown("---")
 st.markdown(
-    '<p style="text-align: center; color: #888;">Powered by <a href="https://www.yugensys.com/" target="_blank" style="color: #0F52BA;">Yugensys Software</a></p>',
+    '<p style="text-align: center; color: #888;">Powered by <a" target="_blank" style="color: #0F52BA;"></a></p>',
     unsafe_allow_html=True,
 )
